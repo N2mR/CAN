@@ -1,4 +1,5 @@
 #include <M5StickC.h>
+#include <bitset>
 
 #include "CAN_config.h"
 #include "ESP32CAN.h"
@@ -8,7 +9,7 @@
 
 // M5StickC plusのGroveポート
 #define TX_PORT GPIO_NUM_32 
-#define RX_PORT GPIO_NUM_33 
+#define RX_PORT GPIO_NUM_33
 
 // CAN設定クラス
 CAN_device_t CAN_cfg;
@@ -21,7 +22,7 @@ std::string getCanData();
 
 void setup() {
 	// Initialize the M5StickC objects
-	Serial.begin(115200);
+	Serial.begin(9600);
 	SerialBT.begin("M5StickC");
 	M5.begin();
 
@@ -100,19 +101,22 @@ std::string getCanData()
 		std::string strData;
 		for(uint8_t i = 0 ; i < DLC; i++)
 		{
-			int data = static_cast<int>(rx_frame.data.u8[i]);
-			constexpr int bufferSize = sizeof(int) * 2 + 1;  // 整数のバイト数 × 2 + 1（null終端文字列の分）
-			char buffer[bufferSize];
+			uint8_t data = static_cast<int>(rx_frame.data.u8[i]);
+			// constexpr int bufferSize = sizeof(int) * 2 + 1;  // 整数のバイト数 × 2 + 1（null終端文字列の分）
+			// char buffer[bufferSize];
 			
-			// sprintfを使用して整数を16進数文字列に変換
-			sprintf(buffer, "%X", data);
+			// // sprintfを使用して整数を16進数文字列に変換
+			// sprintf(buffer, "%X", data);
 
-			strData.append(std::string(buffer));
-			strData.append(", ");
+			std::bitset<8> binaryData(data);
+			std::string strBinaryData = binaryData.to_string();
+
+			strData.append(std::string(strBinaryData));
+			strData.append(",");
 		}
 
 		// 出力文字列の形成
-		std::string strOutputCanData = "time: " + strTime + "  " + "MsgID: " + strMsgID + "  " + "DLC: " + strDLC + "  " + "data: " + strData;
+		std::string strOutputCanData = "time: " + strTime + "  " + "MsgID: " + strMsgID + "  " + "data: " + strData;
 
 		return strOutputCanData;
 	}

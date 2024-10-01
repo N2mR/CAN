@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": "../../../../../.platformio"
+		},
+		{
+			"name": "Can",
+			"path": ".."
+		}
+	],
+	"settings": {}
+}
