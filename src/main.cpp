@@ -6,6 +6,9 @@
 
 #include "BluetoothSerial.h"
 
+#include "MonitoringService.h"
+#include "Sender.h"
+
 
 // M5StickC plusのGroveポート
 #define TX_PORT GPIO_NUM_32 
