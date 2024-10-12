@@ -2,11 +2,11 @@
 
 
 loop true
-    main --> MonitoringService: monitoringCanData()
-        MonitoringService-->Parser: getCanData()
-        Parser-->MonitoringService: id, length data
+    main --> Monitoring: monitoringCanData()
+        Monitoring-->Parser: getCanData()
+        Parser-->Monitoring: id, length data
         alt 対象CANID
-        MonitoringService ->> main: E_DataKind, data
+        Monitoring ->> main: E_DataKind, data
         end
 
     alt 対象CANID
