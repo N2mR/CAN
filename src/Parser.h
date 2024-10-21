@@ -4,6 +4,8 @@
 #include <vector>
 #include "CANID.h"
 
+
+// TBD: 取得するメッセージIDごとにパース処理を分けたい
 class Parser
 {
 public:

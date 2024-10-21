@@ -14,7 +14,7 @@ std::string Monitoring::monitoringCanData()
 	if (existsCanFrame())
 	{
 		// CanDataを文字列取得
-		std::string strRet = getCanData();
+		strRet = getCanData();
 	}
 
     return strRet;
@@ -60,20 +60,35 @@ std::string Monitoring::getCanData()
 		std::string strDLC = std::to_string(DLC);
 		// CAN data u8
 		std::string strData;
+		uint64_t uData = 0x00;
 		for(uint8_t i = 0 ; i < DLC; i++)
 		{
 			uint8_t data = static_cast<int>(rx_frame.data.u8[i]);
 			std::bitset<8> binaryData(data);
 			std::string strBinaryData = binaryData.to_string();
-
 			strData.append(std::string(strBinaryData));
 			strData.append(",");
+
+			// 一律でuint64_tに変換
+			uData = uData << 8 | rx_frame.data.u8[i];
 		}
 
 		// 出力文字列の形成
-		std::string strOutputCanData = "time: " + strTime + "  " + "MsgID: " + strMsgID + "  " + "data: " + strData;
+		if (rx_frame.MsgID == 256)
+		{
+			uint32_t rpm = (uData >> 40) & 0xFFFFFF;
 
-		return strOutputCanData;
+			uint32_t throttle = (uData >> 32) & 0x000000FF;
+
+			strOutputCanData = "{\"rpm\":\"" + std::to_string(rpm) + "\",\"throttle\":\"" + std::to_string(throttle) + "\"}";
+
+			return strOutputCanData;
+		}
+		else
+		{
+			// 目的のMsgIDと異なる場合、空文字列を返す
+			return "";
+		}
 	}
 	return strOutputCanData;
 }

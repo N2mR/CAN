@@ -1,14 +1,10 @@
 #include <M5StickC.h>
-#include <bitset>
-
 
 #include "CAN_config.h"
 #include "ESP32CAN.h"
 #include "BluetoothSerial.h"
 
 #include "Monitoring.h"
-#include "Sender.h"
-
 
 // M5StickC plusのGroveポート
 #define TX_PORT GPIO_NUM_32 
@@ -18,6 +14,7 @@
 BluetoothSerial SerialBT;
 CAN_device_t CAN_cfg;
 Monitoring* objMonitoring;
+uint16_t tick = 0;
 
 // プロトタイプ宣言
 bool existsCanFrame();
@@ -46,11 +43,14 @@ void setup() {
 }
 
 void loop() {
-	// 生存確認
-	M5.Lcd.setCursor(10, 0, 1);
-	std::string running = "running";
-	M5.Lcd.println(running.c_str());
-
-	// ゆくゆくはcstrに変換してM5StackにBluetoothで送信する
-	std::string strCanData = objMonitoring->monitoringCanData();
+	tick++;
+	if (tick % 1000 == 0)
+	{
+		// BluetoothでM5Stackに送信
+		std::string strCanData = objMonitoring->monitoringCanData();
+		if (strCanData != "")
+		{
+			SerialBT.println(strCanData.c_str());
+		}
+	}
 }
